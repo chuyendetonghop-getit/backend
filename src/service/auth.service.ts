@@ -37,3 +37,7 @@ export async function login(email: string, password: string) {
     "password"
   );
 }
+
+export async function forgotPassword(email: string) {
+  // Logic để xử lý quên mật khẩu
+}

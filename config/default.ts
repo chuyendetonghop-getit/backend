@@ -31,4 +31,6 @@ export default {
     `,
   refreshTokenPrivateKey: ``,
   refreshTokenPublicKey: ``,
+  email: "khuynhdev",
+  emailPassword: "ftvi kzhs jqao vxip",
 };

@@ -2,6 +2,8 @@ import { omit } from "lodash";
 import { FilterQuery } from "mongoose";
 import UserModel, { UserDocument, UserInput } from "../models/user.model";
 import logger from "../utils/logger";
+import { signJwt } from "../utils/jwt.utils";
+import config from "config";
 
 export async function createUser(input: UserInput) {
   const existingUser = await UserModel.findOne({ email: input.email });
@@ -11,7 +13,21 @@ export async function createUser(input: UserInput) {
   }
 
   const user = await UserModel.create(input);
-  return omit(user.toJSON(), "password");
+
+  // Chuyển đổi instance model thành plain JavaScript object
+  const userObject = user.toObject();
+
+  const userWithoutPassword = omit(userObject, "password");
+
+  // Thêm token vào đối tượng người dùng
+  const accessToken = signJwt({ ...userObject }, "accessTokenPrivateKey", {
+    expiresIn: config.get("accessTokenTtl"),
+  });
+
+  return {
+    ...userWithoutPassword,
+    accessToken,
+  };
 }
 
 export async function validatePassword({
