@@ -23,8 +23,8 @@ export const forgotPasswordSchema = object({
 
 export const updatePasswordSchema = object({
   body: object({
-    userId: string({
-      required_error: "User ID is required",
+    phone: string({
+      required_error: "Phone is required",
     }),
     newPassword: string({
       required_error: "New password is required",

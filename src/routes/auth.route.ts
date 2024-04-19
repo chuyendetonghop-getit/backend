@@ -32,7 +32,7 @@ router.post("/signup", validateResource(createUserSchema), signupHandler);
 router.post("/resend-otp", validateResource(resendOTPSchema), resendOTPHandler);
 
 router.post(
-  "/verify-sign-up",
+  "/verify-signup",
   validateResource(verifySignUpSchema),
   verifySignupHandler
 );

@@ -51,7 +51,7 @@ export async function signupHandler(
 ) {
   try {
     const user = await createUser(req.body);
-    return sendSuccessResponse(res, user, HttpStatusCode.Ok, "Sign up success");
+    return sendSuccessResponse(res, null, HttpStatusCode.Ok, "Sign up success");
   } catch (e: any) {
     logger.error(e);
     return sendErrorResponse(res, HttpStatusCode.NotFound, e.message);
@@ -63,11 +63,16 @@ export async function resendOTPHandler(
   res: Response
 ) {
   try {
-    const { userId, resendType } = req.body;
-    console.log("userId", userId);
+    const { phone, resendType } = req.body;
+    console.log("phone", phone);
     console.log("resendType", resendType);
 
-    const token = await findToken({ userId });
+    const user = await findUser({ phone });
+    if (!user?._id) {
+      return sendErrorResponse(res, HttpStatusCode.NotFound, "User not found");
+    }
+
+    const token = await findToken({ userId: user?._id });
     if (!token) {
       return sendErrorResponse(
         res,
@@ -93,8 +98,6 @@ export async function resendOTPHandler(
 
     // Gửi OTP qua SMS
 
-    const user = await findUser({ _id: userId });
-
     const message = `${
       OTP_TYPE_SHOW_OFF[resendType as ETokenTypes]
     }: Your OTP is ${randomOTPCode}. It will expire in 5 minutes`;
@@ -118,10 +121,15 @@ export async function verifySignupHandler(
   res: Response
 ) {
   try {
-    const { userId, otpVerify } = req.body;
+    const { phone, otpVerify } = req.body;
 
-    const user = await findUser({ _id: userId });
-    if (user?.verify) {
+    const user = await findUser({ phone });
+
+    if (!user?._id) {
+      return sendErrorResponse(res, HttpStatusCode.NotFound, "User not found");
+    }
+
+    if (user && user?.verify) {
       return sendErrorResponse(
         res,
         HttpStatusCode.NotFound,
@@ -130,7 +138,7 @@ export async function verifySignupHandler(
     }
     // Logic để xác thực SMS OTP
     const isVerified = await verifyOTP(
-      userId,
+      user?._id,
       ETokenTypes.OTP_VERIFY,
       otpVerify
     );
@@ -145,7 +153,7 @@ export async function verifySignupHandler(
       );
     } else {
       // Update user status
-      const user = await updateUser({ _id: userId }, { verify: true });
+      const user = await updateUser({ phone }, { verify: true });
 
       return sendSuccessResponse(
         res,
@@ -221,15 +229,19 @@ export async function verifyForgotPasswordHandler(
   res: Response
 ) {
   try {
-    const { userId, otpReset } = req.body;
+    const { phone, otpReset } = req.body;
 
-    const user = await findUser({ _id: userId });
+    const user = await findUser({ phone: phone });
     if (!user?._id) {
       return sendErrorResponse(res, HttpStatusCode.NotFound, "User not found");
     }
 
     // Logic để xác thực SMS OTP Forgot Password
-    const isVerified = await verifyOTP(userId, ETokenTypes.OTP_RESET, otpReset);
+    const isVerified = await verifyOTP(
+      user._id,
+      ETokenTypes.OTP_RESET,
+      otpReset
+    );
     logger.info("isVerified boolean", isVerified);
 
     if (!isVerified) {
@@ -240,11 +252,11 @@ export async function verifyForgotPasswordHandler(
         "OTP is invalid or expired"
       );
     } else {
-      const userWithoutPassword = omit(user, "password");
+      // const userWithoutPassword = omit(user, "password");
 
       return sendSuccessResponse(
         res,
-        userWithoutPassword,
+        null,
         HttpStatusCode.Ok,
         "Forgot password OTP verified successfully"
       );
@@ -260,9 +272,9 @@ export async function updatePasswordHandler(
   res: Response
 ) {
   try {
-    const { userId, newPassword } = req.body;
+    const { phone, newPassword } = req.body;
 
-    const user = await findUser({ _id: userId });
+    const user = await findUser({ phone: phone });
     if (!user?._id) {
       return sendErrorResponse(res, HttpStatusCode.NotFound, "User not found");
     }
@@ -274,7 +286,7 @@ export async function updatePasswordHandler(
 
     // Update user password
     const updatedUser = await updateUser(
-      { _id: userId },
+      { phone: phone },
       { password: hash },
       {
         new: true,
@@ -282,11 +294,11 @@ export async function updatePasswordHandler(
       }
     );
 
-    const userWithoutPassword = omit(updatedUser, "password");
+    // const userWithoutPassword = omit(updatedUser, "password");
 
     return sendSuccessResponse(
       res,
-      userWithoutPassword,
+      null,
       HttpStatusCode.Ok,
       "Forgot password OTP verified successfully"
     );

@@ -22,8 +22,8 @@ export const createTokenSchema = object({
 
 export const resendOTPSchema = object({
   body: object({
-    userId: string({
-      required_error: "User ID is required",
+    phone: string({
+      required_error: "Phone is required",
     }),
     resendType: string({
       required_error: "Resend Type is required",
@@ -33,8 +33,8 @@ export const resendOTPSchema = object({
 
 export const verifySignUpSchema = object({
   body: object({
-    userId: string({
-      required_error: "User ID is required",
+    phone: string({
+      required_error: "Phone is required",
     }),
     otpVerify: string({
       required_error: "otpVerify is required",
@@ -44,8 +44,8 @@ export const verifySignUpSchema = object({
 
 export const verifyForgotPasswordSchema = object({
   body: object({
-    userId: string({
-      required_error: "User ID is required",
+    phone: string({
+      required_error: "phone is required",
     }),
     otpReset: string({
       required_error: "otpReset is required",
