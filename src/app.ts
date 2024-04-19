@@ -1,7 +1,6 @@
 import config from "config";
 import dotenv from "dotenv";
 import express from "express";
-import deserializeUser from "./middleware/deserializeUser";
 import connect from "./utils/connect";
 import logger from "./utils/logger";
 
@@ -21,7 +20,7 @@ app.use(express.json());
 app.use("/api/v1", apiRouter);
 
 // Sử dụng các router con vào router chính
-apiRouter.use("/users", deserializeUser, userRouter);
+apiRouter.use("/users", userRouter);
 apiRouter.use("/auth", authRouter);
 
 app.listen(port, async () => {

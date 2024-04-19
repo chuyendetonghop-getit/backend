@@ -7,20 +7,31 @@ export const loginSchema = object({
     password: string({
       required_error: "Password is required",
     }).min(6, "Password too short - should be 6 chars minimum"),
-    email: string({
-      required_error: "Email is required",
-    }).email("Not a valid email"),
+    phone: string({
+      required_error: "Phone is required",
+    }),
+  }),
+});
+
+export const forgotPasswordSchema = object({
+  body: object({
+    phone: string({
+      required_error: "Phone is required",
+    }),
+  }),
+});
+
+export const updatePasswordSchema = object({
+  body: object({
+    userId: string({
+      required_error: "User ID is required",
+    }),
+    newPassword: string({
+      required_error: "New password is required",
+    }),
   }),
 });
 
 export type LoginInput = TypeOf<typeof loginSchema>;
-
-export const forgotPasswordSchema = object({
-  body: object({
-    email: string({
-      required_error: "Email is required",
-    }).email("Not a valid email"),
-  }),
-});
-
 export type ForgotPasswordInput = TypeOf<typeof forgotPasswordSchema>;
+export type UpdatePasswordInput = TypeOf<typeof updatePasswordSchema>;

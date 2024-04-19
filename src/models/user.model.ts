@@ -1,14 +1,18 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import config from "config";
+import { EUserRoles } from "../constant/enum";
 
 export interface UserInput {
-  email: string;
   name: string;
+  // email?: string;
+  phone: string;
   password: string;
 }
 
 export interface UserDocument extends UserInput, mongoose.Document {
+  verify: boolean;
+  role: string;
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<Boolean>;
@@ -16,9 +20,11 @@ export interface UserDocument extends UserInput, mongoose.Document {
 
 const userSchema = new mongoose.Schema(
   {
-    email: { type: String, required: true, unique: true },
     name: { type: String, required: true },
+    phone: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    verify: { type: Boolean, default: false },
+    role: { type: String, default: EUserRoles.USER },
   },
   {
     timestamps: true,
@@ -27,7 +33,7 @@ const userSchema = new mongoose.Schema(
 );
 
 userSchema.pre("save", async function (next) {
-  let user = this as UserDocument;
+  let user = this as unknown as UserDocument;
 
   if (!user.isModified("password")) {
     return next();

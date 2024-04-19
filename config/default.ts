@@ -33,4 +33,6 @@ export default {
   refreshTokenPublicKey: ``,
   email: "khuynhdev",
   emailPassword: "ftvi kzhs jqao vxip",
+  idmesin: "487",
+  pin: "258654",
 };

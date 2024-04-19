@@ -1,15 +1,22 @@
+import bcrypt from "bcrypt";
+import config from "config";
+import crypto from "crypto";
 import { omit } from "lodash";
 import { FilterQuery } from "mongoose";
+
 import UserModel, { UserDocument, UserInput } from "../models/user.model";
-import logger from "../utils/logger";
 import { signJwt } from "../utils/jwt.utils";
-import config from "config";
+import logger from "../utils/logger";
+import { sendSMS } from "../utils/sms";
+import { createToken } from "./token.service";
+import { OTP_TYPE_SHOW_OFF } from "../constant/shared.constant";
+import { ETokenTypes } from "../constant/enum";
 
 export async function createUser(input: UserInput) {
-  const existingUser = await UserModel.findOne({ email: input.email });
+  const existingUser = await UserModel.findOne({ phone: input.phone });
 
   if (existingUser) {
-    throw new Error(`User with email ${input.email} already exists`);
+    throw new Error(`User with phone number ${input.phone} already exists`);
   }
 
   const user = await UserModel.create(input);
@@ -19,10 +26,34 @@ export async function createUser(input: UserInput) {
 
   const userWithoutPassword = omit(userObject, "password");
 
-  // Thêm token vào đối tượng người dùng
-  const accessToken = signJwt({ ...userObject }, "accessTokenPrivateKey", {
-    expiresIn: config.get("accessTokenTtl"),
+  const accessToken = signJwt(
+    { ...userWithoutPassword },
+    "accessTokenPrivateKey",
+    {
+      expiresIn: config.get("accessTokenTtl"),
+    }
+  );
+
+  const randomOTPCode = crypto.randomInt(100000, 999999).toString();
+
+  const salt = await bcrypt.genSalt(config.get<number>("saltWorkFactor"));
+
+  const hash = await bcrypt.hashSync(randomOTPCode, salt);
+
+  // Save hash to database
+  await createToken({
+    userId: user._id,
+    otpVerify: hash,
+    otpVerifyExpireAt: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
   });
+
+  // Send sms otp
+  await sendSMS(
+    user.phone,
+    `${
+      OTP_TYPE_SHOW_OFF[ETokenTypes.OTP_VERIFY]
+    }: Your OTP is ${randomOTPCode}. It will expire in 5 minutes`
+  );
 
   return {
     ...userWithoutPassword,
@@ -30,26 +61,14 @@ export async function createUser(input: UserInput) {
   };
 }
 
-export async function validatePassword({
-  email,
-  password,
-}: {
-  email: string;
-  password: string;
-}) {
-  const user = await UserModel.findOne({ email });
-
-  if (!user) {
-    return false;
-  }
-
-  const isValid = await user.comparePassword(password);
-  logger.info(`Password validation for email ${email} is ${isValid}`);
-  if (!isValid) return false;
-
-  return omit(user.toJSON(), "password");
-}
-
 export async function findUser(query: FilterQuery<UserDocument>) {
   return UserModel.findOne(query).lean();
+}
+
+export async function updateUser(
+  query: FilterQuery<UserDocument>,
+  update: Partial<UserDocument>,
+  config?: UpdateUserOptions
+) {
+  return UserModel.findOneAndUpdate(query, update, config);
 }
