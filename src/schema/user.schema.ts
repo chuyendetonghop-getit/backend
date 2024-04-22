@@ -5,28 +5,63 @@ export const createUserSchema = object({
     name: string({
       required_error: "Name is required",
     }),
-    // email: string({
-    //   required_error: "Email is required",
-    // })
-    //   .email("Not a valid email")
-    //   .optional(),
     phone: string({
       required_error: "Phone number is required",
     }),
     password: string({
       required_error: "Password is required",
     }).min(6, "Password too short - should be 6 chars minimum"),
-    // passwordConfirmation: string({
-    //   required_error: "passwordConfirmation is required",
-    // }),
   }),
-  // .refine((data) => data.password === data.passwordConfirmation, {
-  //   message: "Passwords do not match",
-  //   path: ["passwordConfirmation"],
-  // }),
 });
 
-export type CreateUserInput = Omit<
-  TypeOf<typeof createUserSchema>,
-  "body.passwordConfirmation"
->;
+export const getListUsersSchema = object({
+  query: object({
+    limit: string({
+      required_error: "Limit is required",
+    }).optional(),
+    page: string({
+      required_error: "Page is required",
+    }).optional(),
+    name: string({
+      required_error: "Name is required",
+    }).optional(),
+    phone: string({
+      required_error: "Phone is required",
+    }).optional(),
+  }),
+});
+
+export const getUserByIdSchema = object({
+  params: object({
+    id: string({
+      required_error: "User ID is required",
+    }),
+  }),
+});
+
+export const updateUserByIdSchema = object({
+  params: object({
+    id: string({
+      required_error: "User ID is required",
+    }),
+  }),
+  body: object({
+    name: string({
+      required_error: "Name is required",
+    }),
+  }),
+});
+
+export const deleteUserByIdSchema = object({
+  params: object({
+    id: string({
+      required_error: "User ID is required",
+    }),
+  }),
+});
+
+export type CreateUserInput = TypeOf<typeof createUserSchema>;
+export type GetListUserInput = TypeOf<typeof getListUsersSchema>;
+export type GetUserByIdInput = TypeOf<typeof getUserByIdSchema>;
+export type UpdateUserByIdInput = TypeOf<typeof updateUserByIdSchema>;
+export type DeleteUserByIdInput = TypeOf<typeof deleteUserByIdSchema>;

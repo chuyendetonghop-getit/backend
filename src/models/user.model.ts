@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import config from "config";
+import mongoosePaginate from "mongoose-paginate-v2";
 import { EUserRoles } from "../constant/enum";
 
 export interface UserInput {
@@ -56,6 +57,11 @@ userSchema.methods.comparePassword = async function (
   return bcrypt.compare(candidatePassword, user.password).catch((e) => false);
 };
 
-const UserModel = mongoose.model<UserDocument>("User", userSchema);
+userSchema.plugin(mongoosePaginate);
+
+const UserModel = mongoose.model<
+  UserDocument,
+  mongoose.PaginateModel<UserDocument>
+>("User", userSchema, "users");
 
 export default UserModel;
