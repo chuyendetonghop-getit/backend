@@ -33,7 +33,6 @@ export async function login(phone: string, password: string) {
   //   Generate JWT
   const accessToken = signJwt(
     { ...userWithoutPassword },
-    "accessTokenPrivateKey",
     { expiresIn: config.get("accessTokenTtl") } // 15 minutes,
   );
 

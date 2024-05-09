@@ -7,3 +7,5 @@ interface UpdateUserOptions {
   runValidators?: boolean;
   strict?: boolean;
 }
+
+interface UpdatePostOptions extends UpdateUserOptions {}

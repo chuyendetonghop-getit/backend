@@ -6,6 +6,8 @@ import logger from "./utils/logger";
 
 import authRouter from "./routes/auth.route";
 import userRouter from "./routes/user.route";
+import postRouter from "./routes/post.route";
+import validateToken from "./middleware/validateToken";
 
 dotenv.config();
 
@@ -20,8 +22,13 @@ app.use(express.json());
 app.use("/api/v1", apiRouter);
 
 // Sử dụng các router con vào router chính
-apiRouter.use("/users", userRouter);
 apiRouter.use("/auth", authRouter);
+
+// Start apply middleware
+apiRouter.use(validateToken);
+
+apiRouter.use("/user", userRouter);
+apiRouter.use("/post", postRouter);
 
 app.listen(port, async () => {
   logger.info(`App is running at http://localhost:${port}`);

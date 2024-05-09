@@ -28,7 +28,6 @@ export async function createUser(input: CreateUserInput["body"]) {
 
   const accessToken = signJwt(
     { ...userWithoutPassword },
-    "accessTokenPrivateKey",
     {
       expiresIn: config.get("accessTokenTtl"),
     }
