@@ -73,10 +73,10 @@ export const getPostSchema = object({
 
 export const getListPostsSchema = object({
   query: object({
-    limit: number({
+    limit: string({
       required_error: "Limit is required",
     }).optional(),
-    page: number({
+    page: string({
       required_error: "Page is required",
     }).optional(),
     title: string({
