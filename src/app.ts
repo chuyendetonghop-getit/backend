@@ -8,6 +8,7 @@ import authRouter from "./routes/auth.route";
 import userRouter from "./routes/user.route";
 import postRouter from "./routes/post.route";
 import validateToken from "./middleware/validateToken";
+import loggerMiddleware from "./middleware/loggerMiddleware";
 
 dotenv.config();
 
@@ -18,6 +19,9 @@ const port = config.get<number>("port");
 const app = express();
 
 app.use(express.json());
+
+// Sử dụng middleware để log thông tin về request
+app.use(loggerMiddleware);
 
 app.use("/api/v1", apiRouter);
 
