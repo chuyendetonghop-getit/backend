@@ -16,9 +16,11 @@ const statusSchema = object({
 });
 
 const locationSchema = object({
+  type: string(),
+  coordinates: number().array(),
   lat: string(),
   lon: string(),
-  address: string(),
+  displayName: string(),
 });
 
 const payload = {
@@ -78,6 +80,15 @@ export const getListPostsSchema = object({
     }).optional(),
     page: string({
       required_error: "Page is required",
+    }).optional(),
+    lat: string({
+      required_error: "Latitude is required",
+    }).optional(),
+    long: string({
+      required_error: "Longitude is required",
+    }).optional(),
+    radius: string({
+      required_error: "Radius is required",
     }).optional(),
     title: string({
       required_error: "Title is required",

@@ -25,7 +25,19 @@ export async function updatePost(
 }
 
 export async function getListPosts(input: GetListPostsInput["query"]) {
-  const { limit = 10, page = 1, title, description, category, status } = input;
+  const {
+    limit = 10,
+    page = 1,
+    title,
+    description,
+    category,
+    status,
+    lat,
+    long,
+    radius,
+  } = input;
+
+  console.log("this is head ***", lat, long, radius);
 
   const query: FilterQuery<PostDocument> = {};
 
@@ -49,10 +61,20 @@ export async function getListPosts(input: GetListPostsInput["query"]) {
     query.status = status;
   }
 
+  if (lat && long && radius) {
+    query.location = {
+      $geoWithin: {
+        $centerSphere: [[Number(long), Number(lat)], Number(radius) / 6378.1],
+      },
+    };
+  }
+
   const options: PaginateOptions = {
     limit: +limit,
     page: +page,
     sort: { createdAt: "desc" },
+    // forceCountFn: true is required to get total count on all documents while using $geoWithin in mongoose-paginate-v2
+    forceCountFn: true,
   };
 
   return PostModel.paginate(query, options);
