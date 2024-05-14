@@ -23,6 +23,13 @@ app.use(express.json());
 // Sử dụng middleware để log thông tin về request
 app.use(loggerMiddleware);
 
+// Thêm một route mới, để kiểm tra xem server có hoạt động không và trả về kèm thời gian hiện tại
+app.get("/", (req, res) => {
+  return res.send(
+    "Hello World From Get - It Project 💚💙🩷 " + new Date().toLocaleString()
+  );
+});
+
 app.use("/api/v1", apiRouter);
 
 // Sử dụng các router con vào router chính
