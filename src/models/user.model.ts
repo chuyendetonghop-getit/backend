@@ -14,6 +14,17 @@ export interface UserInput {
 export interface UserDocument extends UserInput, mongoose.Document {
   verify: boolean;
   role: string;
+  avatar?: string;
+  geoLocation?: {
+    location: {
+      type: string;
+      coordinates: number[];
+      lat: string;
+      lon: string;
+      displayName: string;
+    };
+    radius: number;
+  };
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<Boolean>;
@@ -24,6 +35,22 @@ const userSchema = new mongoose.Schema(
     name: { type: String, required: true },
     phone: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    avatar: { type: String },
+    geoLocation: {
+      location: {
+        type: {
+          type: String,
+          enum: ["Point"],
+        },
+        coordinates: {
+          type: [Number],
+        },
+        lat: { type: String },
+        lon: { type: String },
+        displayName: { type: String },
+      },
+      radius: { type: Number },
+    },
     verify: { type: Boolean, default: false },
     role: { type: String, default: EUserRoles.USER },
   },

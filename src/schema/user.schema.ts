@@ -1,4 +1,4 @@
-import { object, string, TypeOf } from "zod";
+import { number, object, string, TypeOf } from "zod";
 
 export const createUserSchema = object({
   body: object({
@@ -48,7 +48,32 @@ export const updateUserByIdSchema = object({
   body: object({
     name: string({
       required_error: "Name is required",
-    }),
+    }).optional(),
+    avatar: string({
+      required_error: "Avatar is required",
+    }).optional(),
+    geoLocation: object({
+      location: object({
+        type: string({
+          required_error: "Type is required",
+        }),
+        coordinates: number({
+          required_error: "Coordinates is required",
+        }).array(),
+        lat: string({
+          required_error: "Latitude is required",
+        }),
+        lon: string({
+          required_error: "Longitude is required",
+        }),
+        displayName: string({
+          required_error: "Display name is required",
+        }),
+      }),
+      radius: number({
+        required_error: "Radius is required",
+      }),
+    }).optional(),
   }),
 });
 

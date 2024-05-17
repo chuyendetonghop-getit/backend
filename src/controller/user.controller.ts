@@ -76,7 +76,9 @@ export async function updateUserHandler(
 
     const updatedData = req.body;
 
-    const updateResult = await updateUser({ _id: user._id }, updatedData);
+    const updateResult = await updateUser({ _id: user._id }, updatedData, {
+      new: true,
+    });
 
     return sendSuccessResponse(
       res,
