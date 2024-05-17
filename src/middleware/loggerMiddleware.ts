@@ -3,7 +3,7 @@ import log from "../utils/logger"; // Đường dẫn tới file logger.ts của
 
 const loggerMiddleware = (req: Request, res: Response, next: NextFunction) => {
   // Log thông tin về request
-  log.info(`Request :➡ ${req.method} ${req.url}`);
+  // log.warn(`->| ${req.method} ${req.url}`);
 
   // Ghi nhận thời gian bắt đầu xử lý request
   const start = Date.now();
@@ -11,8 +11,8 @@ const loggerMiddleware = (req: Request, res: Response, next: NextFunction) => {
   // Khi response đã gửi xong, log thêm thông tin về response
   res.on("finish", () => {
     const duration = Date.now() - start;
-    log.fatal(
-      `Response ←: ${req.method} ${req.url} ${res.statusCode} ${duration}ms`
+    log.warn(
+      `|-> ${req.method} ${res.statusCode} ${duration}ms ${req.originalUrl} `
     );
   });
 
