@@ -83,24 +83,24 @@ export const getListPostsSchema = object({
     }).optional(),
     lat: string({
       required_error: "Latitude is required",
-    }).optional(),
-    long: string({
+    }),
+    lon: string({
       required_error: "Longitude is required",
-    }).optional(),
+    }),
     radius: string({
       required_error: "Radius is required",
-    }).optional(),
+    }),
     title: string({
       required_error: "Title is required",
     }).optional(),
     description: string({
       required_error: "Description is required",
     }).optional(),
-    category: string({
-      required_error: "Category is required",
+    categoryId: string({
+      required_error: "CategoryId is required",
     }).optional(),
-    status: string({
-      required_error: "Status is required",
+    statusId: string({
+      required_error: "StatusId is required",
     }).optional(),
   }),
 });

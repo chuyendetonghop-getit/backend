@@ -30,44 +30,66 @@ export async function getListPosts(input: GetListPostsInput["query"]) {
     page = 1,
     title,
     description,
-    category,
-    status,
+    categoryId,
+    statusId,
     lat,
-    long,
+    lon,
     radius,
   } = input;
 
-  console.log("this is head ***", lat, long, radius);
+  // console.log("this is head ***", lat, lon, radius);
 
-  const query: FilterQuery<PostDocument> = {};
+  // const query: FilterQuery<PostDocument> = {};
 
-  if (title || description) {
-    query.$or = [];
-    if (title) {
-      query.$or.push({ title: { $regex: new RegExp(`.*${title}.*`, "i") } });
-    }
-    if (description) {
-      query.$or.push({
-        description: { $regex: new RegExp(`.*${description}.*`) },
-      });
-    }
-  }
+  // if (title || description) {
+  //   query.$or = [];
+  //   if (title) {
+  //     query.$or.push({ title: { $regex: new RegExp(`.*${title}.*`, "i") } });
+  //   }
+  //   if (description) {
+  //     query.$or.push({
+  //       description: { $regex: new RegExp(`.*${description}.*`) },
+  //     });
+  //   }
+  // }
 
-  if (category) {
-    query.category = category;
-  }
+  // if (categoryId) {
+  //   query["category.cat_id"] = categoryId;
+  // }
 
-  if (status) {
-    query.status = status;
-  }
+  // if (statusId) {
+  //   query["status.status_id"] = statusId;
+  // }
 
-  if (lat && long && radius) {
-    query.location = {
+  // if (lat && lon && radius) {
+  //   query.location = {
+  //     $geoWithin: {
+  //       $centerSphere: [
+  //         [parseFloat(lon), parseFloat(lat)],
+  //         Number(radius) / 6378.1,
+  //       ],
+  //     },
+  //   };
+  // }
+
+  // console.log("Q -<", query);
+  const findQuery: FilterQuery<PostDocument> = {
+    location: {
       $geoWithin: {
-        $centerSphere: [[Number(long), Number(lat)], Number(radius) / 6378.1],
+        $centerSphere: [
+          [parseFloat(lon), parseFloat(lat)],
+          parseFloat(radius) / 6378.1,
+        ], // radius in kilometers
       },
-    };
-  }
+    },
+  };
+
+  // Additional filters
+  if (title) findQuery.title = { $regex: title, $options: "i" };
+  if (description)
+    findQuery.description = { $regex: description, $options: "i" };
+  if (categoryId) findQuery["category.cat_id"] = categoryId;
+  if (statusId) findQuery["status.id"] = statusId;
 
   const options: PaginateOptions = {
     limit: +limit,
@@ -77,7 +99,7 @@ export async function getListPosts(input: GetListPostsInput["query"]) {
     forceCountFn: true,
   };
 
-  return PostModel.paginate(query, options);
+  return PostModel.paginate(findQuery, options);
 }
 
 export async function deletePost(query: FilterQuery<PostDocument>) {

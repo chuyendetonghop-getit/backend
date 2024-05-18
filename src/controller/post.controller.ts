@@ -44,9 +44,10 @@ export async function getListPostHandler(
   req: Request<GetListPostsInput["query"]>,
   res: Response
 ) {
-  console.log("this is head ***");
+  // console.log("this is head ***", req.query);
   try {
-    const posts = await getListPosts(req.query);
+    // TODO: temporary solution fix type issue with req.query
+    const posts = await getListPosts(req.query as GetListPostsInput["query"]);
 
     return sendSuccessResponse(
       res,
