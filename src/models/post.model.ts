@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
+import { Schema } from "zod";
 
 export interface PostInput {
   userId: string;
@@ -37,7 +38,11 @@ export interface PostDocument extends PostInput, mongoose.Document {
 
 const PostSchema = new mongoose.Schema(
   {
-    userId: { type: String, required: true },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "User",
+    },
     location: {
       type: {
         type: String,

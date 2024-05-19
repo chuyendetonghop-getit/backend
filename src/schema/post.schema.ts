@@ -71,6 +71,14 @@ export const deletePostSchema = object({
 
 export const getPostSchema = object({
   ...params,
+  query: object({
+    lat: string({
+      required_error: "Latitude is required",
+    }),
+    lon: string({
+      required_error: "Longitude is required",
+    }),
+  }),
 });
 
 export const getListPostsSchema = object({

@@ -9,6 +9,7 @@ import {
   UpdatePostInput,
 } from "../schema/post.schema";
 import {
+  aggregatePost,
   createPost,
   deletePost,
   findPost,
@@ -20,6 +21,8 @@ import {
   sendErrorResponse,
   sendSuccessResponse,
 } from "../utils/responseTransform";
+import { cloneDeep } from "lodash";
+import { calculateDistance } from "../utils/location";
 
 export async function createPostHandler(
   req: Request<{}, {}, CreatePostInput["body"]>,
@@ -41,17 +44,38 @@ export async function createPostHandler(
 }
 
 export async function getListPostHandler(
-  req: Request<GetListPostsInput["query"]>,
+  req: Request<{}, {}, {}, GetListPostsInput["query"]>,
   res: Response
 ) {
   // console.log("this is head ***", req.query);
   try {
     // TODO: temporary solution fix type issue with req.query
-    const posts = await getListPosts(req.query as GetListPostsInput["query"]);
+    const paginatedPosts = await getListPosts(
+      req.query as GetListPostsInput["query"]
+    );
+
+    const clonePaginatedPosts = cloneDeep(paginatedPosts);
+
+    const insertedDistancePostsDocs = clonePaginatedPosts?.docs.map(
+      (post: any) => {
+        const distance = calculateDistance(
+          parseFloat(req.query.lat),
+          parseFloat(req.query.lon),
+          post.location.coordinates[1],
+          post.location.coordinates[0]
+        );
+        // console.log("distance XXX->", distance);
+        post.distance = distance;
+
+        return post;
+      }
+    );
+
+    clonePaginatedPosts.docs = insertedDistancePostsDocs;
 
     return sendSuccessResponse(
       res,
-      posts,
+      clonePaginatedPosts,
       HttpStatusCode.Ok,
       "Get all posts success"
     );
@@ -62,22 +86,43 @@ export async function getListPostHandler(
 }
 
 export async function getPostByIdHandler(
-  req: Request<GetPostByIdInput["params"], {}, {}>,
+  req: Request<GetPostByIdInput["params"], {}, {}, GetPostByIdInput["query"]>,
+  // req: Request,
   res: Response
 ) {
   try {
-    const postId = req.params.id;
-    const post = await findPost({ _id: postId });
+    const { id } = req.params;
+    const { lat, lon } = req.query;
 
-    if (!post?._id) {
+    console.log("postId", id, lat, lon);
+    const posts = await aggregatePost({ _id: id });
+
+    const targetPost = posts[0];
+
+    if (!targetPost?._id) {
       return sendErrorResponse(res, HttpStatusCode.NotFound, "Post not found");
     }
 
+    const clonePost = cloneDeep(targetPost);
+
+    clonePost.author = clonePost.author[0];
+
+    const distance = calculateDistance(
+      parseFloat(lat),
+      parseFloat(lon),
+      clonePost.location.coordinates[1],
+      clonePost.location.coordinates[0]
+    );
+
+    // console.log("distance", distance);
+
+    clonePost.distance = distance;
+
     return sendSuccessResponse(
       res,
-      post,
+      clonePost,
       HttpStatusCode.Ok,
-      "Get user success"
+      "Get post by id success"
     );
   } catch (e: any) {
     logger.error(e);

@@ -1,4 +1,4 @@
-import { FilterQuery, PaginateOptions } from "mongoose";
+import mongoose, { FilterQuery, PaginateOptions } from "mongoose";
 
 import PostModel, { PostDocument } from "../models/post.model";
 import { CreatePostInput, GetListPostsInput } from "../schema/post.schema";
@@ -14,6 +14,34 @@ export async function createPost(input: CreatePostInput["body"]) {
 
 export async function findPost(query: FilterQuery<PostDocument>) {
   return PostModel.findOne(query).lean();
+}
+
+export async function aggregatePost(query: FilterQuery<PostDocument>) {
+  return await PostModel.aggregate([
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(query._id),
+      },
+    }, // Lọc các bài post dựa trên điều kiện truy vấn
+    {
+      $lookup: {
+        from: "users", // Tên của bảng users trong MongoDB
+        localField: "userId", // Trường trong bảng Post mà bạn muốn sử dụng để join với userId trong bảng Users
+        foreignField: "_id", // Trường trong bảng Users mà bạn muốn sử dụng để join với localField trong bảng Post
+        as: "author", // Tên của trường chứa thông tin người dùng sau khi join
+      },
+    },
+    {
+      $project: {
+        "author.password": 0,
+        // "author.createdAt": 0,
+        "author.updatedAt": 0,
+        "author.geoLocation": 0,
+        "author.role": 0,
+        "author.verify": 0,
+      },
+    },
+  ]);
 }
 
 export async function updatePost(
@@ -95,6 +123,7 @@ export async function getListPosts(input: GetListPostsInput["query"]) {
     limit: +limit,
     page: +page,
     sort: { createdAt: "desc" },
+    lean: true,
     // forceCountFn: true is required to get total count on all documents while using $geoWithin in mongoose-paginate-v2
     forceCountFn: true,
   };
