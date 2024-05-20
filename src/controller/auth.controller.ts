@@ -177,7 +177,7 @@ export async function forgotPasswordHandler(
 
     const userOrNot = await findUser({ phone });
 
-    console.log("userOrNot", userOrNot);
+    // console.log("userOrNot", userOrNot);
 
     if (!userOrNot) {
       return sendErrorResponse(res, HttpStatusCode.NotFound, "User not found");
@@ -300,7 +300,7 @@ export async function updatePasswordHandler(
       res,
       null,
       HttpStatusCode.Ok,
-      "Forgot password OTP verified successfully"
+      "Update password successfully"
     );
   } catch (e: any) {
     logger.error;
