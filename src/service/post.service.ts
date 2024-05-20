@@ -1,4 +1,4 @@
-import mongoose, { FilterQuery, PaginateOptions } from "mongoose";
+import mongoose, { FilterQuery, PaginateOptions, QueryOptions } from "mongoose";
 
 import PostModel, { PostDocument } from "../models/post.model";
 import { CreatePostInput, GetListPostsInput } from "../schema/post.schema";
@@ -14,6 +14,25 @@ export async function createPost(input: CreatePostInput["body"]) {
 
 export async function findPost(query: FilterQuery<PostDocument>) {
   return PostModel.findOne(query).lean();
+}
+
+export async function findMyPost(query: FilterQuery<PostDocument>) {
+  const { limit = 10, page = 1, userId } = query;
+
+  const options: PaginateOptions = {
+    limit: +limit,
+    page: +page,
+    sort: { createdAt: "desc" },
+    lean: true,
+    forceCountFn: true,
+  };
+
+  return PostModel.paginate(
+    {
+      userId,
+    },
+    options
+  );
 }
 
 export async function aggregatePost(query: FilterQuery<PostDocument>) {
@@ -47,7 +66,7 @@ export async function aggregatePost(query: FilterQuery<PostDocument>) {
 export async function updatePost(
   query: FilterQuery<PostDocument>,
   update: Partial<PostDocument>,
-  config?: UpdatePostOptions
+  config?: QueryOptions
 ) {
   return PostModel.findOneAndUpdate(query, update, config);
 }

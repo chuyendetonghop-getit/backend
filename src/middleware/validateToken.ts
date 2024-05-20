@@ -16,11 +16,11 @@ const validateToken = async (
   }
 
   try {
-    const { valid, expired, decoded } = await verifyJwt(accessToken as string);
+    const { valid, expired } = await verifyJwt(accessToken as string);
     if (!valid || expired) {
       return res.sendStatus(401);
     }
-    res.locals.user = decoded;
+    // res.locals.user = decoded;
     next();
   } catch (error) {
     logger.error(error);

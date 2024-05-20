@@ -33,7 +33,7 @@ const payload = {
     title: string({
       required_error: "Title is required",
     }),
-    price: string({
+    price: number({
       required_error: "Price is required",
     }),
     status: statusSchema,
@@ -113,8 +113,23 @@ export const getListPostsSchema = object({
   }),
 });
 
+export const getMyPostsSchema = object({
+  query: object({
+    userId: string({
+      required_error: "UserId is required",
+    }),
+    limit: string({
+      required_error: "Limit is required",
+    }).optional(),
+    page: string({
+      required_error: "Page is required",
+    }).optional(),
+  }),
+});
+
 export type CreatePostInput = TypeOf<typeof createPostSchema>;
 export type UpdatePostInput = TypeOf<typeof updatePostSchema>;
 export type GetPostByIdInput = TypeOf<typeof getPostSchema>;
 export type GetListPostsInput = TypeOf<typeof getListPostsSchema>;
 export type DeletePostInput = TypeOf<typeof deletePostSchema>;
+export type GetMyPostsInput = TypeOf<typeof getMyPostsSchema>;

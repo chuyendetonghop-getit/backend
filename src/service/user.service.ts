@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import config from "config";
 import crypto from "crypto";
 import { omit } from "lodash";
-import { FilterQuery, PaginateOptions } from "mongoose";
+import { FilterQuery, PaginateOptions, QueryOptions } from "mongoose";
 
 import { ETokenTypes } from "../constant/enum";
 import { OTP_TYPE_SHOW_OFF } from "../constant/shared.constant";
@@ -67,7 +67,7 @@ export async function findUser(query: FilterQuery<UserDocument>) {
 export async function updateUser(
   query: FilterQuery<UserDocument>,
   update: Partial<UserDocument>,
-  config?: UpdateUserOptions
+  config?: QueryOptions
 ) {
   return UserModel.findOneAndUpdate(query, update, config);
 }

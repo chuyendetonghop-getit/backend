@@ -5,6 +5,7 @@ import {
   CreatePostInput,
   DeletePostInput,
   GetListPostsInput,
+  GetMyPostsInput,
   GetPostByIdInput,
   UpdatePostInput,
 } from "../schema/post.schema";
@@ -12,6 +13,7 @@ import {
   aggregatePost,
   createPost,
   deletePost,
+  findMyPost,
   findPost,
   getListPosts,
   updatePost,
@@ -179,6 +181,25 @@ export async function deletePostHandler(
       deleteResult,
       HttpStatusCode.Ok,
       "Delete post success"
+    );
+  } catch (e: any) {
+    logger.error(e);
+    return sendErrorResponse(res, HttpStatusCode.NotFound, e.message);
+  }
+}
+
+export async function getMyPostsHandler(
+  req: Request<{}, {}, {}, GetMyPostsInput["query"]>,
+  res: Response
+) {
+  try {
+    const paginatedPosts = await findMyPost(req.query);
+
+    return sendSuccessResponse(
+      res,
+      paginatedPosts,
+      HttpStatusCode.Ok,
+      "Get my posts success"
     );
   } catch (e: any) {
     logger.error(e);
