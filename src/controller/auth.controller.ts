@@ -35,6 +35,8 @@ export async function loginHandler(
   req: Request<{}, {}, LoginInput["body"]>,
   res: Response
 ) {
+  // const role = req.headers["role"] as string;
+  // console.log("role>>>", role);
   try {
     const { phone, password } = req.body;
     const user = await login(phone, password);

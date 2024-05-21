@@ -73,11 +73,11 @@ export async function updateUser(
 }
 
 export async function getListUsers(input: GetListUserInput["query"]) {
-  const { limit = 10, page = 1, name: userName, phone } = input;
+  const { limit = 10, page = 1, name: userName, phone, search } = input;
 
   const query: FilterQuery<UserDocument> = {};
 
-  if (userName || phone) {
+  if (userName || phone || search) {
     query.$or = [];
     if (userName) {
       query.$or.push({ name: { $regex: new RegExp(`.*${userName}.*`, "i") } });
@@ -85,6 +85,11 @@ export async function getListUsers(input: GetListUserInput["query"]) {
     if (phone) {
       const regex = new RegExp(`(?=.*${phone})(?=(?:.*\\d{3,}))`);
       query.$or.push({ phone: { $regex: regex } });
+    }
+
+    if (search) {
+      query.$or.push({ name: { $regex: new RegExp(`.*${search}.*`, "i") } });
+      query.$or.push({ phone: { $regex: new RegExp(`.*${search}.*`, "i") } });
     }
   }
 

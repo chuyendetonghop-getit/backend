@@ -28,6 +28,9 @@ export const getListUsersSchema = object({
     phone: string({
       required_error: "Phone is required",
     }).optional(),
+    search: string({
+      required_error: "Search is required",
+    }).optional(),
   }),
 });
 
