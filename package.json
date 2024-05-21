@@ -25,6 +25,7 @@
     "pino": "^8.20.0",
     "pino-pretty": "^11.0.0",
     "response-time": "^2.3.2",
+    "socket.io": "^4.7.5",
     "zod": "^3.22.4"
   },
   "devDependencies": {
