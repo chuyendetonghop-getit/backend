@@ -1,7 +1,11 @@
 import mongoose, { FilterQuery, PaginateOptions, QueryOptions } from "mongoose";
 
 import PostModel, { PostDocument } from "../models/post.model";
-import { CreatePostInput, GetListPostsInput } from "../schema/post.schema";
+import {
+  CreatePostInput,
+  GetListPostsAdminInput,
+  GetListPostsInput,
+} from "../schema/post.schema";
 
 export async function createPost(input: CreatePostInput["body"]) {
   try {
@@ -152,4 +156,30 @@ export async function getListPosts(input: GetListPostsInput["query"]) {
 
 export async function deletePost(query: FilterQuery<PostDocument>) {
   return PostModel.deleteOne(query);
+}
+
+// get all posts by admin
+export async function getPostsByAdmin(input: GetListPostsAdminInput["query"]) {
+  const { limit = 10, page = 1, search } = input;
+
+  const query: FilterQuery<PostDocument> = {};
+
+  if (search) {
+    query.$or = [];
+
+    query.$or.push({ title: { $regex: new RegExp(`.*${search}.*`, "i") } });
+    query.$or.push({
+      description: { $regex: new RegExp(`.*${search}.*`, "i") },
+    });
+  }
+
+  const options: PaginateOptions = {
+    limit: +limit,
+    page: +page,
+    sort: { createdAt: "desc" },
+    lean: true,
+    forceCountFn: true,
+  };
+
+  return PostModel.paginate(query, options);
 }

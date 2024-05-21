@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 import {
   CreatePostInput,
   DeletePostInput,
+  GetListPostsAdminInput,
   GetListPostsInput,
   GetMyPostsInput,
   GetPostByIdInput,
@@ -16,6 +17,7 @@ import {
   findMyPost,
   findPost,
   getListPosts,
+  getPostsByAdmin,
   updatePost,
 } from "../service/post.service";
 import logger from "../utils/logger";
@@ -200,6 +202,26 @@ export async function getMyPostsHandler(
       paginatedPosts,
       HttpStatusCode.Ok,
       "Get my posts success"
+    );
+  } catch (e: any) {
+    logger.error(e);
+    return sendErrorResponse(res, HttpStatusCode.NotFound, e.message);
+  }
+}
+
+// get post by admin handler
+export async function getPostByAdminHandler(
+  req: Request<{}, {}, {}, GetListPostsAdminInput["query"]>,
+  res: Response
+) {
+  try {
+    const paginatedPosts = await getPostsByAdmin(req.query);
+
+    return sendSuccessResponse(
+      res,
+      paginatedPosts,
+      HttpStatusCode.Ok,
+      "Get all posts success"
     );
   } catch (e: any) {
     logger.error(e);

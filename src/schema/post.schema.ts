@@ -127,9 +127,24 @@ export const getMyPostsSchema = object({
   }),
 });
 
+export const getListPostsAdminSchema = object({
+  query: object({
+    limit: string({
+      required_error: "Limit is required",
+    }).optional(),
+    page: string({
+      required_error: "Page is required",
+    }).optional(),
+    search: string({
+      required_error: "Search is required",
+    }).optional(),
+  }),
+});
+
 export type CreatePostInput = TypeOf<typeof createPostSchema>;
 export type UpdatePostInput = TypeOf<typeof updatePostSchema>;
 export type GetPostByIdInput = TypeOf<typeof getPostSchema>;
 export type GetListPostsInput = TypeOf<typeof getListPostsSchema>;
 export type DeletePostInput = TypeOf<typeof deletePostSchema>;
 export type GetMyPostsInput = TypeOf<typeof getMyPostsSchema>;
+export type GetListPostsAdminInput = TypeOf<typeof getListPostsAdminSchema>;
