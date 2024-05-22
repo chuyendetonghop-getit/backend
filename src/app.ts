@@ -13,6 +13,7 @@ import validateToken from "./middleware/validateToken";
 import authRouter from "./routes/auth.route";
 import postRouter from "./routes/post.route";
 import userRouter from "./routes/user.route";
+import { seedPostHandler, seedUserHandler } from "./controller/seed.controller";
 
 dotenv.config();
 
@@ -43,6 +44,10 @@ app.get("/", (req, res) => {
     "Hello World From Get - It Project 💚💙🩷 " + new Date().toLocaleString()
   );
 });
+
+// route to seed data
+app.get("/seed/user/:number", seedUserHandler);
+app.get("/seed/post/:number", seedPostHandler);
 
 app.use("/api/v1", apiRouter);
 
