@@ -171,6 +171,24 @@ export async function getPostsByAdmin(input: GetListPostsAdminInput["query"]) {
     query.$or.push({
       description: { $regex: new RegExp(`.*${search}.*`, "i") },
     });
+
+    // why this query below not working? i just test it by query with a phone number
+
+    query.$or.push({
+      "category.cat_name": { $regex: new RegExp(`.*${search}.*`, "i") },
+    });
+
+    query.$or.push({
+      "status.name": { $regex: new RegExp(`.*${search}.*`, "i") },
+    });
+
+    query.$or.push({
+      phone: { $regex: new RegExp(`.*${search}.*`, "i") },
+    });
+
+    // query.$or.push({
+    //   "location.displayName": { $regex: new RegExp(`.*${search}.*`, "i") },
+    // });
   }
 
   const options: PaginateOptions = {
