@@ -3,17 +3,23 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import { createServer } from "http";
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 
 import connect from "./utils/connect";
 import logger from "./utils/logger";
 
+import { seedPostHandler, seedUserHandler } from "./controller/seed.controller";
 import loggerMiddleware from "./middleware/loggerMiddleware";
 import validateToken from "./middleware/validateToken";
 import authRouter from "./routes/auth.route";
 import postRouter from "./routes/post.route";
 import userRouter from "./routes/user.route";
-import { seedPostHandler, seedUserHandler } from "./controller/seed.controller";
+import { verifyJwt } from "./utils/jwt.utils";
+
+interface SocketWithUser extends Socket {
+  // TODO: define user type
+  user: any;
+}
 
 dotenv.config();
 
@@ -27,6 +33,7 @@ const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
     origin: "*",
+    credentials: true,
   },
 });
 
@@ -62,20 +69,41 @@ apiRouter.use("/post", postRouter);
 
 // socket.io middleware to check token
 io.use((socket, next) => {
-  const token = socket.handshake.auth.token;
+  const headerToken = socket.handshake.headers.authorization;
+  // console.log("headerToken ->", headerToken);
 
-  if (token) {
-    return next();
+  if (!headerToken) {
+    return next(new Error("Missing Bearer Authentication in extraHeaders"));
   }
 
-  return next(new Error("Authentication error"));
+  const token = headerToken?.split(" ")[1];
+  if (!token) {
+    return next(new Error("Invalid token format"));
+  }
+
+  // check token
+  const { valid, expired, decoded } = verifyJwt(token);
+  // console.log("decoded ->", decoded);
+
+  if (!valid || expired) {
+    return next(new Error("Invalid or Expired after check token"));
+  }
+
+  // add user to socket
+  (socket as SocketWithUser).user = decoded;
+
+  next();
 });
 
 io.on("connection", (socket) => {
-  logger.warn("A user connected ->", socket.id);
+  console.info(" 🌟 A user connected ->", socket.id);
+
+  const user = (socket as SocketWithUser).user;
+
+  console.log("user ->", user);
 
   socket.on("disconnect", () => {
-    logger.error("A user disconnected ->", socket.id);
+    console.error(" 💫 A user disconnected ->", socket.id);
   });
 });
 
@@ -86,7 +114,7 @@ io.engine.on("connection_error", (err) => {
   console.log(err.context); // some additional error context
 });
 
-app.listen(port, async () => {
+httpServer.listen(port, async () => {
   logger.info(`App is running at http://localhost:${port}`);
 
   await connect();
