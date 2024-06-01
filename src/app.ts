@@ -3,20 +3,23 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import { createServer } from "http";
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 
 import connect from "./utils/connect";
 import logger from "./utils/logger";
 
 import { seedPostHandler, seedUserHandler } from "./controller/seed.controller";
+import { socketListener } from "./controller/socket.controller";
+
 import loggerMiddleware from "./middleware/loggerMiddleware";
+import socketMiddleware from "./middleware/socketMiddleware";
 import validateToken from "./middleware/validateToken";
+
 import authRouter from "./routes/auth.route";
+import conversationRouter from "./routes/conversation.route";
+import messageRouter from "./routes/message.route";
 import postRouter from "./routes/post.route";
 import userRouter from "./routes/user.route";
-import { verifyJwt } from "./utils/jwt.utils";
-import socketMiddleware from "./middleware/socketMiddleware";
-import { socketListener } from "./controller/socket.controller";
 
 dotenv.config();
 
@@ -63,6 +66,8 @@ apiRouter.use(validateToken);
 
 apiRouter.use("/user", userRouter);
 apiRouter.use("/post", postRouter);
+apiRouter.use("/conversation", conversationRouter);
+apiRouter.use("/message", messageRouter);
 
 // socket.io middleware to check token
 io.use(socketMiddleware);

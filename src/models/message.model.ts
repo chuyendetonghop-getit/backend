@@ -1,0 +1,50 @@
+// message.model.ts
+import mongoose from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2";
+
+export interface MessageInput {
+  conversationId: string;
+  senderId: string;
+  text?: string;
+  media?: string[];
+}
+
+export interface MessageDocument extends MessageInput, mongoose.Document {
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const MessageSchema = new mongoose.Schema(
+  {
+    conversationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "Conversation",
+    },
+    senderId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "User",
+    },
+    text: { type: String },
+    media: [
+      {
+        type: String,
+      },
+    ],
+    createdAt: { type: Date, default: Date.now },
+  },
+  {
+    timestamps: true,
+    versionKey: false,
+  }
+);
+
+MessageSchema.plugin(mongoosePaginate);
+
+const MessageModel = mongoose.model<
+  MessageDocument,
+  mongoose.PaginateModel<MessageDocument>
+>("Message", MessageSchema);
+
+export default MessageModel;
