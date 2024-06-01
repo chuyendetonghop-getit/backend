@@ -70,7 +70,6 @@ apiRouter.use("/post", postRouter);
 // socket.io middleware to check token
 io.use((socket, next) => {
   const headerToken = socket.handshake.headers.authorization;
-  // console.log("headerToken ->", headerToken);
 
   if (!headerToken) {
     return next(new Error("Missing Bearer Authentication in extraHeaders"));
@@ -100,7 +99,7 @@ io.on("connection", (socket) => {
 
   const user = (socket as SocketWithUser).user;
 
-  console.log("user ->", user);
+  console.log("user ->", user?.name);
 
   socket.on("disconnect", () => {
     console.error(" 💫 A user disconnected ->", socket.id);
@@ -108,10 +107,10 @@ io.on("connection", (socket) => {
 });
 
 io.engine.on("connection_error", (err) => {
-  console.log(err.req); // the request object
+  // console.log(err.req); // the request object
   console.log(err.code); // the error code, for example 1
   console.log(err.message); // the error message, for example "Session ID unknown"
-  console.log(err.context); // some additional error context
+  // console.log(err.context); // some additional error context
 });
 
 httpServer.listen(port, async () => {
