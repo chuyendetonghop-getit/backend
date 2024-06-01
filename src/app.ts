@@ -15,11 +15,8 @@ import authRouter from "./routes/auth.route";
 import postRouter from "./routes/post.route";
 import userRouter from "./routes/user.route";
 import { verifyJwt } from "./utils/jwt.utils";
-
-interface SocketWithUser extends Socket {
-  // TODO: define user type
-  user: any;
-}
+import socketMiddleware from "./middleware/socketMiddleware";
+import { socketListener } from "./controller/socket.controller";
 
 dotenv.config();
 
@@ -68,50 +65,9 @@ apiRouter.use("/user", userRouter);
 apiRouter.use("/post", postRouter);
 
 // socket.io middleware to check token
-io.use((socket, next) => {
-  const headerToken = socket.handshake.headers.authorization;
+io.use(socketMiddleware);
 
-  if (!headerToken) {
-    return next(new Error("Missing Bearer Authentication in extraHeaders"));
-  }
-
-  const token = headerToken?.split(" ")[1];
-  if (!token) {
-    return next(new Error("Invalid token format"));
-  }
-
-  // check token
-  const { valid, expired, decoded } = verifyJwt(token);
-  // console.log("decoded ->", decoded);
-
-  if (!valid || expired) {
-    return next(new Error("Invalid or Expired after check token"));
-  }
-
-  // add user to socket
-  (socket as SocketWithUser).user = decoded;
-
-  next();
-});
-
-io.on("connection", (socket) => {
-  console.info(" 🌟 A user connected ->", socket.id);
-
-  const user = (socket as SocketWithUser).user;
-
-  console.log("user ->", user?.name);
-
-  socket.on("disconnect", () => {
-    console.error(" 💫 A user disconnected ->", socket.id);
-  });
-});
-
-io.engine.on("connection_error", (err) => {
-  // console.log(err.req); // the request object
-  console.log(err.code); // the error code, for example 1
-  console.log(err.message); // the error message, for example "Session ID unknown"
-  // console.log(err.context); // some additional error context
-});
+socketListener(io);
 
 httpServer.listen(port, async () => {
   logger.info(`App is running at http://localhost:${port}`);
