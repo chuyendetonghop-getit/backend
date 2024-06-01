@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from "express";
 
 import logger from "../utils/logger";
 import { verifyJwt } from "../utils/jwt.utils";
+import { UserDocument } from "../models/user.model";
 
 const validateToken = async (
   req: Request,
@@ -16,11 +17,11 @@ const validateToken = async (
   }
 
   try {
-    const { valid, expired } = await verifyJwt(accessToken as string);
+    const { valid, expired, decoded } = await verifyJwt(accessToken as string);
     if (!valid || expired) {
       return res.sendStatus(401);
     }
-    // res.locals.user = decoded;
+    res.locals.user = decoded as UserDocument;
     next();
   } catch (error) {
     logger.error(error);
