@@ -10,12 +10,17 @@ export interface MessageInput {
 }
 
 export interface MessageDocument extends MessageInput, mongoose.Document {
+  originalId: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
 const MessageSchema = new mongoose.Schema(
   {
+    originId: {
+      type: String,
+      required: true,
+    },
     conversationId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,

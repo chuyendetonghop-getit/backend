@@ -1,4 +1,3 @@
-import { SocketWithUser } from "../types/socket.type";
 import { verifyJwt } from "../utils/jwt.utils";
 
 // TODO: fix any type in socket middleware
@@ -23,7 +22,7 @@ export default function socketMiddleware(socket: any, next: any) {
   }
 
   // add user to socket
-  (socket as SocketWithUser).user = decoded;
+  socket.user = decoded;
 
   next();
 }
