@@ -20,7 +20,7 @@ export interface PostInput {
   };
   images: string[];
   title: string;
-  price: string;
+  price: number;
   status: {
     name: string;
     id: string;
