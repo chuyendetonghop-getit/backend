@@ -17,3 +17,14 @@ export enum ESocketEvents {
   CHAT_SEND_MESSAGE = "chatSendMessage",
   CHAT_RECEIVE_MESSAGE = "chatReceiveMessage",
 }
+
+// enum for report post
+export enum EReportReasonTypes {
+  FRAUD = "fraud",
+  DUPLICATE = "duplicate",
+  ITEM_SOLD = "itemSold",
+  UNABLE_TO_CONTACT = "unableToContact",
+  INACCURATE_CONTENT = "inaccurateContent",
+  COUNTERFEIT_GOODS = "counterfeitGoods",
+  ITEM_DAMAGED_AFTER_PURCHASE = "itemDamagedAfterPurchase",
+}

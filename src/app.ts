@@ -19,6 +19,7 @@ import authRouter from "./routes/auth.route";
 import conversationRouter from "./routes/conversation.route";
 import messageRouter from "./routes/message.route";
 import postRouter from "./routes/post.route";
+import reportRouter from "./routes/report.route";
 import userRouter from "./routes/user.route";
 
 dotenv.config();
@@ -68,6 +69,7 @@ apiRouter.use("/user", userRouter);
 apiRouter.use("/post", postRouter);
 apiRouter.use("/conversation", conversationRouter);
 apiRouter.use("/message", messageRouter);
+apiRouter.use("/report", reportRouter);
 
 // socket.io middleware to check token
 io.use(socketMiddleware);
