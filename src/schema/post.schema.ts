@@ -33,7 +33,7 @@ const payload = {
     title: string({
       required_error: "Title is required",
     }),
-    price: string({
+    price: number({
       required_error: "Price is required",
     }),
     status: statusSchema,
