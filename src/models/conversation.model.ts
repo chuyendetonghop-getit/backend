@@ -1,6 +1,6 @@
 // conversation.model.ts
 import mongoose from "mongoose";
-import mongoosePaginate from "mongoose-paginate-v2";
+import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 export interface ConversationInput {
   postId: string;
@@ -43,11 +43,11 @@ const ConversationSchema = new mongoose.Schema(
   }
 );
 
-ConversationSchema.plugin(mongoosePaginate);
+ConversationSchema.plugin(aggregatePaginate);
 
 const ConversationModel = mongoose.model<
   ConversationDocument,
-  mongoose.PaginateModel<ConversationDocument>
+  mongoose.AggregatePaginateModel<ConversationDocument>
 >("Conversation", ConversationSchema);
 
 export default ConversationModel;

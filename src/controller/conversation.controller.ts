@@ -15,6 +15,8 @@ import {
   getDetailConversation,
   getListConversations,
 } from "../service/conversation.service";
+import { cloneDeep } from "lodash";
+import { UserDocument } from "../models/user.model";
 
 export async function getListConversationHandler(
   req: Request<{}, {}, {}, GetListConversationInput["query"]>,
@@ -28,9 +30,33 @@ export async function getListConversationHandler(
       req.query as GetListConversationInput["query"]
     );
 
+    // console.log("paginatedConversations", paginatedConversations);
+    const tmpConversation = cloneDeep(paginatedConversations);
+
+    const cloneDocs = tmpConversation.docs.map((conversation) => {
+      const partner = conversation.participantsDetail.find(
+        (participant: UserDocument) =>
+          participant._id.toString() !== user?._id.toString()
+      );
+
+      // delete unnecessary fields
+      delete conversation.participantsDetail;
+
+      return {
+        ...conversation,
+        post: conversation.post[0],
+        partner: partner,
+      };
+    });
+
+    const finalConversations = {
+      ...tmpConversation,
+      docs: cloneDocs,
+    };
+
     return sendSuccessResponse(
       res,
-      paginatedConversations,
+      finalConversations,
       HttpStatusCode.Ok,
       "Get all conversations success"
     );
@@ -53,18 +79,35 @@ export async function getConversationByIdHandler(
 ) {
   try {
     const { id } = req.params;
-    // const { page, limit } = req.query;
 
-    console.log("conversationId", id);
-    const post = await getDetailConversation(id);
+    const conversations = (await getDetailConversation(id)) as any[];
+    console.log("conversation", conversations);
 
-    if (!post) {
-      return sendErrorResponse(res, HttpStatusCode.NotFound, "Post not found");
+    if (conversations.length === 0) {
+      return sendErrorResponse(
+        res,
+        HttpStatusCode.NotFound,
+        "Conversation not found"
+      );
     }
+
+    const thisConversation = conversations[0];
+
+    const cloneConversation = cloneDeep(thisConversation) as any;
+    const partner = cloneConversation.participantsDetail.find(
+      (participant: UserDocument) =>
+        participant._id.toString() !== res.locals.user?._id.toString()
+    );
+
+    cloneConversation.partner = partner;
+    cloneConversation.post = cloneConversation.post[0];
+
+    // delete unnecessary fields
+    delete cloneConversation.participantsDetail;
 
     return sendSuccessResponse(
       res,
-      post,
+      cloneConversation,
       HttpStatusCode.Ok,
       "Get post by id success"
     );

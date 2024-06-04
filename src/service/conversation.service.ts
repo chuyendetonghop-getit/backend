@@ -1,9 +1,8 @@
-import { FilterQuery, PaginateOptions } from "mongoose";
+import { PaginateOptions } from "mongoose";
 
-import ConversationModel, {
-  ConversationDocument,
-} from "../models/conversation.model";
+import ConversationModel from "../models/conversation.model";
 import { GetListConversationInput } from "../schema/conversation.schema";
+import { detailConversation, listConversation } from "../utils/mongoose";
 
 export async function getListConversations(
   userId: string,
@@ -11,24 +10,25 @@ export async function getListConversations(
 ) {
   const { limit = 10, page = 1 } = input;
 
-  const query: FilterQuery<ConversationDocument> = {
-    // query for conversation where user is a participant
-    participants: { $in: [userId] },
-  };
-
   const options: PaginateOptions = {
     limit: +limit,
     page: +page,
     // sort by latest conversation
-    sort: { updatedAt: "desc" },
-    lean: true,
+    sort: { updatedAt: -1 },
+    // lean: true,
+    // pagination: true,
   };
 
-  return ConversationModel.paginate(query, options);
+  const aggregate = listConversation(userId);
+
+  const listConversationAggregate = ConversationModel.aggregate(aggregate);
+
+  return ConversationModel.aggregatePaginate(
+    listConversationAggregate,
+    options
+  );
 }
 
 export async function getDetailConversation(conversationId: string) {
-  return ConversationModel.findOne({ _id: conversationId })
-    .populate("postId")
-    .lean();
+  return ConversationModel.aggregate(detailConversation(conversationId));
 }
