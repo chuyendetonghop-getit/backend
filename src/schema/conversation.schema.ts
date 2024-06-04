@@ -2,8 +2,11 @@ import { TypeOf, object, string } from "zod";
 
 const params = {
   params: object({
-    id: string({
-      required_error: "conversationId is required",
+    receiverId: string({
+      required_error: "receiverId is required",
+    }),
+    postId: string({
+      required_error: "postId is required",
     }),
   }),
 };

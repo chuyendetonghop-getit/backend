@@ -8,7 +8,7 @@ import { getMessageByConversationIdHandler } from "../controller/message.control
 const router = express.Router();
 
 router.get(
-  "/:conversationId",
+  "/:receiverId/:postId",
   validateResource(getMessageByConversationIdSchema),
   getMessageByConversationIdHandler
 );

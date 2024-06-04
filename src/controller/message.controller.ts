@@ -28,12 +28,21 @@ export async function getMessageByConversationIdHandler(
   res: Response
 ) {
   try {
-    const { conversationId } = req.params;
+    const userId = res.locals.user?._id;
+
+    const { receiverId, postId } = req.params;
     const { page, limit } = req.query;
 
-    console.log("conversationId", conversationId, "page", page, "limit", limit);
+    const conversation = await getDetailConversation({
+      userId,
+      receiverId,
+      postId,
+    });
+
+    const thisConversation = conversation[0];
+
     const paginatedMessages = await getMessagesByConversationId(
-      conversationId,
+      thisConversation._id,
       {
         page,
         limit,

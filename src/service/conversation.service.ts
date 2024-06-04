@@ -29,6 +29,16 @@ export async function getListConversations(
   );
 }
 
-export async function getDetailConversation(conversationId: string) {
-  return ConversationModel.aggregate(detailConversation(conversationId));
+export async function getDetailConversation({
+  userId,
+  receiverId,
+  postId,
+}: {
+  userId: string;
+  receiverId: string;
+  postId: string;
+}) {
+  return ConversationModel.aggregate(
+    detailConversation(userId, receiverId, postId)
+  );
 }

@@ -78,10 +78,15 @@ export async function getConversationByIdHandler(
   res: Response
 ) {
   try {
-    const { id } = req.params;
+    const user = res.locals.user;
 
-    const conversations = (await getDetailConversation(id)) as any[];
-    // console.log("conversation", conversations);
+    const { receiverId, postId } = req.params;
+
+    const conversations = (await getDetailConversation({
+      userId: user?._id,
+      receiverId,
+      postId,
+    })) as any[];
 
     if (conversations.length === 0) {
       return sendErrorResponse(

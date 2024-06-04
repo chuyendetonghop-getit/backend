@@ -20,7 +20,7 @@ router.get(
 );
 
 router.get(
-  "/:id",
+  "/:receiverId/:postId",
   validateResource(getConversationSchema),
   getConversationByIdHandler
 );

@@ -50,10 +50,17 @@ export const listConversation = (_id: string) => [
   },
 ];
 
-export const detailConversation = (conversationId: string) => [
+export const detailConversation = (
+  userId: string,
+  receiverId: string,
+  postId: string
+) => [
   {
     $match: {
-      _id: new ObjectId(conversationId),
+      participants: {
+        $in: [new ObjectId(userId), new ObjectId(receiverId)],
+      },
+      postId: new ObjectId(postId),
     },
   },
   {
