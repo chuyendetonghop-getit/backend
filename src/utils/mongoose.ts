@@ -81,4 +81,12 @@ export const detailConversation = (conversationId: string) => [
       as: "participantsDetail",
     },
   },
+  {
+    $lookup: {
+      from: "messages",
+      localField: "_id",
+      foreignField: "conversationId",
+      as: "preMessages",
+    },
+  },
 ];

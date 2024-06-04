@@ -81,7 +81,7 @@ export async function getConversationByIdHandler(
     const { id } = req.params;
 
     const conversations = (await getDetailConversation(id)) as any[];
-    console.log("conversation", conversations);
+    // console.log("conversation", conversations);
 
     if (conversations.length === 0) {
       return sendErrorResponse(
