@@ -5,6 +5,7 @@ import ConversationModel, {
 } from "../models/conversation.model";
 import { GetListConversationInput } from "../schema/conversation.schema";
 import { GetMessageByConversationIdInput } from "../schema/message.schema";
+import MessageModel from "../models/message.model";
 
 export async function getMessagesByConversationId(
   conversationId: string,
@@ -24,5 +25,5 @@ export async function getMessagesByConversationId(
     lean: true,
   };
 
-  return ConversationModel.paginate(query, options);
+  return MessageModel.paginate(query, options);
 }
