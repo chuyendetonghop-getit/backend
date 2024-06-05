@@ -22,7 +22,7 @@ export type TSocketLeaveConversation = IoSocket;
 export type TChatSendMessage = {
   originId: string;
   text?: string;
-  media?: string[];
+  image?: string;
 };
 
 export type TSocketSendMessage = IoSocket & TChatSendMessage;

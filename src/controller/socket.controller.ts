@@ -48,13 +48,13 @@ export async function socketListener(
     // send message event
     socket.on(
       ESocketEvents.CHAT_SEND_MESSAGE,
-      ({ originId, text, media }: TChatSendMessage) => {
+      ({ originId, text, image }: TChatSendMessage) => {
         sendMessage({
           io,
           socket,
           originId,
           text,
-          media,
+          image,
         });
       }
     );

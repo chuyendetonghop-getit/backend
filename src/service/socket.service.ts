@@ -93,7 +93,7 @@ export async function sendMessage({
   socket,
   originId,
   text,
-  media,
+  image,
 }: TSocketSendMessage) {
   // 1. get conversation id from the socket
   const conversationId = socket.conversationId;
@@ -110,7 +110,7 @@ export async function sendMessage({
     conversationId,
     senderId: socket.user?._id,
     text,
-    media,
+    image,
   });
 
   await newMessage.save();
@@ -120,8 +120,7 @@ export async function sendMessage({
     { _id: conversationId },
     {
       lastMessage: {
-        text,
-        media,
+        text: Boolean(text) || !Boolean(image) ? text : "[Hình ảnh]",
         senderId: socket.user?._id,
       },
     }

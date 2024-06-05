@@ -6,7 +6,7 @@ export interface MessageInput {
   conversationId: string;
   senderId: string;
   text?: string;
-  media?: string[];
+  image?: string;
 }
 
 export interface MessageDocument extends MessageInput, mongoose.Document {
@@ -32,11 +32,7 @@ const MessageSchema = new mongoose.Schema(
       ref: "User",
     },
     text: { type: String },
-    media: [
-      {
-        type: String,
-      },
-    ],
+    image: { type: String },
     createdAt: { type: Date, default: Date.now },
   },
   {
