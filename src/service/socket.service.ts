@@ -17,14 +17,18 @@ export async function joinConversation({
   console.log(
     "joinConversation",
     postId,
-    participants[0],
+    participants.senderId,
     "<| |>",
-    participants[1]
+    participants.receiverId
   );
+
+  // 0. assign the receiverId to subscribe to conversation changes
+  socket.receiverId = participants.receiverId;
+
   // 1. check if conversation already exists
   const existedConversation = await ConversationModel.findOne({
     postId,
-    participants: { $all: participants },
+    participants: { $all: [participants.senderId, participants.receiverId] },
   });
   console.log("this existedConversation =>", existedConversation);
 
@@ -46,7 +50,7 @@ export async function joinConversation({
     console.log("creating new conversation");
     const newConversation = new ConversationModel({
       postId,
-      participants,
+      participants: [participants.senderId, participants.receiverId],
     });
     await newConversation.save();
     // 2b.1 - join the conversation
@@ -84,6 +88,10 @@ export async function leaveConversation({
   // 3. assign null to the conversation id in the socket
   socket.conversationId = null;
   console.log("after leaving |=> assigning conversationId to null");
+
+  // 4. assign null to the receiverId in the socket
+  socket.receiverId = null;
+  console.log("after leaving |=> assigning receiverId to null");
 }
 
 // ---------------------------------------------------------
@@ -124,10 +132,6 @@ export async function sendMessage({
         senderId: socket.user?._id,
       },
     }
-    // {
-    //   new: true,
-    //   useFindAndModify: false,
-    // }
   );
 
   // 4. emit the message to the conversation room
@@ -136,4 +140,12 @@ export async function sendMessage({
     .to(conversationId)
     .emit(ESocketEvents.CHAT_RECEIVE_MESSAGE, newMessage);
   console.log("sendMessage:::", text);
+
+  // 5. emit the message to this participants to make conversation list in the client side
+  if (!socket.receiverId) {
+    return;
+  }
+  console.log("receiverId room:-:-:", socket.receiverId);
+
+  socket.to(socket.receiverId).emit(ESocketEvents.CHAT_CONVERSATION_CHANGE);
 }

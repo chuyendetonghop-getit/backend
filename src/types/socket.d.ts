@@ -7,5 +7,6 @@ declare module "socket.io" {
   interface Socket {
     user: UserDocument;
     conversationId: string | null;
+    receiverId: string | null;
   }
 }

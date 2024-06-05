@@ -6,7 +6,7 @@ export interface ConversationInput {
   postId: string;
   participants: string[];
   lastMessage?: {
-    sender: string;
+    senderId: string;
     text: string;
     createdAt: Date;
   };
@@ -32,7 +32,7 @@ const ConversationSchema = new mongoose.Schema(
     // Optional: Last message details for quick overview
     // In case of initial message, lastMessage will be null
     lastMessage: {
-      sender: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      senderId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
       text: String,
       createdAt: Date,
     },

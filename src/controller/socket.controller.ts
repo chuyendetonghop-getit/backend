@@ -30,7 +30,10 @@ export async function socketListener(
           io,
           socket,
           postId: data.postId,
-          participants: [data.receiverId, user._id],
+          participants: {
+            senderId: user?._id,
+            receiverId: data.receiverId,
+          },
         });
       }
     );
@@ -58,6 +61,26 @@ export async function socketListener(
         });
       }
     );
+
+    // -----------------------------------------------
+    // subscribe conversation changes event
+    socket.on(ESocketEvents.CHAT_SUBSCRIBE_CONVERSATION_CHANGE, () => {
+      const userId = user?._id;
+
+      console.log("subscribe conversation changes", userId);
+
+      socket.join(userId);
+    });
+
+    // -----------------------------------------------
+    // unsubscribe to conversation changes event
+    socket.on(ESocketEvents.CHAT_UNSUBSCRIBE_CONVERSATION_CHANGE, () => {
+      const userId = user?._id;
+
+      console.log("Unsubscribe to conversation changes", userId);
+
+      socket.leave(userId);
+    });
 
     // -----------------------------------------------
     // disconnect event

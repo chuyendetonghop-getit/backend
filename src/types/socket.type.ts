@@ -1,3 +1,4 @@
+import { update } from "lodash";
 import { Server, Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 
@@ -12,7 +13,10 @@ export type IoSocket = {
 
 export type TChatJoinConversation = {
   postId: string;
-  participants: [string, string];
+  participants: {
+    receiverId: string;
+    senderId: string;
+  };
 };
 
 export type TSocketJoinConversation = IoSocket & TChatJoinConversation;
