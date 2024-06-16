@@ -29,8 +29,6 @@ const ConversationSchema = new mongoose.Schema(
     participants: [
       { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     ],
-    // Optional: Last message details for quick overview
-    // In case of initial message, lastMessage will be null
     lastMessage: {
       senderId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
       text: String,
@@ -44,7 +42,7 @@ const ConversationSchema = new mongoose.Schema(
 );
 
 ConversationSchema.plugin(aggregatePaginate);
-
+// Conversation Model
 const ConversationModel = mongoose.model<
   ConversationDocument,
   mongoose.AggregatePaginateModel<ConversationDocument>

@@ -4,6 +4,8 @@ import { FilterQuery } from "mongoose";
 import ReportModel, { ReportDocument } from "../models/report.model";
 import { CreateReportInput } from "../schema/report.schema";
 
+// Report service
+
 export async function createReport(input: CreateReportInput["body"]) {
   try {
     const Post = await ReportModel.create(input);
@@ -13,12 +15,10 @@ export async function createReport(input: CreateReportInput["body"]) {
   }
 }
 
-// find report by postId and reporterId
 export async function findReport(query: FilterQuery<ReportDocument>) {
   return ReportModel.findOne(query).lean();
 }
 
-// update report
 export async function updateReport(
   query: FilterQuery<ReportDocument>,
   update: Pick<CreateReportInput["body"], "reason">

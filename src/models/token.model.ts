@@ -26,7 +26,7 @@ const tokenSchema = new mongoose.Schema(
     versionKey: false,
   }
 );
-
+// Token Model
 const TokenModel = mongoose.model("Token", tokenSchema);
 
 export default TokenModel;

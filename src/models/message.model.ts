@@ -42,7 +42,7 @@ const MessageSchema = new mongoose.Schema(
 );
 
 MessageSchema.plugin(mongoosePaginate);
-
+// Message Model
 const MessageModel = mongoose.model<
   MessageDocument,
   mongoose.PaginateModel<MessageDocument>

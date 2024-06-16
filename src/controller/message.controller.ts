@@ -39,10 +39,16 @@ export async function getMessageByConversationIdHandler(
       postId,
     });
 
-    const thisConversation = conversation[0];
+    if (!conversation) {
+      return sendErrorResponse(
+        res,
+        HttpStatusCode.NotFound,
+        "Conversation not found"
+      );
+    }
 
     const paginatedMessages = await getMessagesByConversationId(
-      thisConversation._id,
+      conversation._id,
       {
         page,
         limit,

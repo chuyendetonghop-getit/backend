@@ -2,7 +2,9 @@ import { PaginateOptions } from "mongoose";
 
 import ConversationModel from "../models/conversation.model";
 import { GetListConversationInput } from "../schema/conversation.schema";
-import { detailConversation, listConversation } from "../utils/mongoose";
+import { listConversation } from "../utils/mongoose";
+
+// Conversation service
 
 export async function getListConversations(
   userId: string,
@@ -38,7 +40,8 @@ export async function getDetailConversation({
   receiverId: string;
   postId: string;
 }) {
-  return ConversationModel.aggregate(
-    detailConversation(userId, receiverId, postId)
-  );
+  return ConversationModel.findOne({
+    participants: { $all: [userId, receiverId] },
+    postId,
+  }).lean();
 }

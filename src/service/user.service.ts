@@ -2,15 +2,17 @@ import bcrypt from "bcrypt";
 import config from "config";
 import crypto from "crypto";
 import { omit } from "lodash";
-import { FilterQuery, PaginateOptions, QueryOptions } from "mongoose";
+import { FilterQuery, QueryOptions } from "mongoose";
 
 import { ETokenTypes } from "../constant/enum";
 import { OTP_TYPE_SHOW_OFF } from "../constant/shared.constant";
 import UserModel, { UserDocument } from "../models/user.model";
-import { CreateUserInput, GetListUserInput } from "../schema/user.schema";
+import { CreateUserInput } from "../schema/user.schema";
 import { signJwt } from "../utils/jwt.utils";
 import { sendSMS } from "../utils/sms";
 import { createToken } from "./token.service";
+
+// User service
 
 export async function createUser(input: CreateUserInput["body"]) {
   const existingUser = await UserModel.findOne({ phone: input.phone });
@@ -70,36 +72,6 @@ export async function updateUser(
   config?: QueryOptions
 ) {
   return UserModel.findOneAndUpdate(query, update, config);
-}
-
-export async function getListUsers(input: GetListUserInput["query"]) {
-  const { limit = 10, page = 1, name: userName, phone, search } = input;
-
-  const query: FilterQuery<UserDocument> = {};
-
-  if (userName || phone || search) {
-    query.$or = [];
-    if (userName) {
-      query.$or.push({ name: { $regex: new RegExp(`.*${userName}.*`, "i") } });
-    }
-    if (phone) {
-      const regex = new RegExp(`(?=.*${phone})(?=(?:.*\\d{3,}))`);
-      query.$or.push({ phone: { $regex: regex } });
-    }
-
-    if (search) {
-      query.$or.push({ name: { $regex: new RegExp(`.*${search}.*`, "i") } });
-      query.$or.push({ phone: { $regex: new RegExp(`.*${search}.*`, "i") } });
-    }
-  }
-
-  const options: PaginateOptions = {
-    limit: +limit,
-    page: +page,
-    sort: { createdAt: "desc" },
-  };
-
-  return UserModel.paginate(query, options);
 }
 
 export async function deleteUser(query: FilterQuery<UserDocument>) {

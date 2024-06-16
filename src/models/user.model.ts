@@ -6,7 +6,7 @@ import { EUserRoles } from "../constant/enum";
 
 export interface UserInput {
   name: string;
-  // email?: string;
+  email?: string;
   phone: string;
   password: string;
 }
@@ -34,6 +34,7 @@ const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     phone: { type: String, required: true, unique: true },
+    email: { type: String },
     password: { type: String, required: true },
     avatar: { type: String },
     geoLocation: {
@@ -85,7 +86,7 @@ userSchema.methods.comparePassword = async function (
 };
 
 userSchema.plugin(mongoosePaginate);
-
+// User Model
 const UserModel = mongoose.model<
   UserDocument,
   mongoose.PaginateModel<UserDocument>
