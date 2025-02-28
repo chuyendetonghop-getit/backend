@@ -2,6 +2,8 @@ import { FilterQuery } from "mongoose";
 import TokenModel, { TokenDocument } from "../models/token.model";
 import { CreateTokenInput } from "../schema/token.schema";
 
+// Token service
+
 export async function findToken(query: FilterQuery<TokenDocument>) {
   return TokenModel.findOne(query);
 }

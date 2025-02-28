@@ -7,6 +7,8 @@ import {
   GetListPostsInput,
 } from "../schema/post.schema";
 
+// Post service
+
 export async function createPost(input: CreatePostInput["body"]) {
   try {
     const Post = await PostModel.create(input);

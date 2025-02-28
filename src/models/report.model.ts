@@ -34,7 +34,7 @@ const ReportSchema = new mongoose.Schema(
     versionKey: false,
   }
 );
-
+// Report Model
 const ReportModel = mongoose.model<ReportDocument>("Report", ReportSchema);
 
 export default ReportModel;

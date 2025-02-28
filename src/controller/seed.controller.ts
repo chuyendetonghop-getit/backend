@@ -6,6 +6,7 @@ import { Request, Response } from "express";
 import { getRandomTransformHanoiDistricts } from "../seed/data";
 import { category } from "../utils/category";
 import { statusPost } from "../utils/statusPost";
+import moment from "moment";
 
 // Utils function
 
@@ -20,6 +21,21 @@ const getRandomStatusPost = () => {
   const randomIndex = Math.floor(Math.random() * statusPost.length);
   return statusPost[randomIndex];
 };
+
+// Hàm để tạo ra ngày ngẫu nhiên trong phạm vi từ đầu năm hiện tại đến ngày hiện tại
+function getRandomPastDateInCurrentYear() {
+  const startOfYear = moment().startOf("year"); // Đầu năm hiện tại
+  const currentDate = moment(); // Ngày hiện tại
+  const daysInYear = currentDate.diff(startOfYear, "days"); // Số ngày từ đầu năm đến hiện tại
+
+  // Tạo số ngày ngẫu nhiên từ 1 đến số ngày từ đầu năm đến hiện tại
+  const randomDaysAgo = Math.floor(Math.random() * daysInYear) + 1;
+
+  // Tạo ngày ngẫu nhiên bằng cách trừ đi số ngày ngẫu nhiên từ ngày hiện tại
+  const randomDate = currentDate.subtract(randomDaysAgo, "days").toDate();
+
+  return randomDate;
+}
 
 //   ----------------
 
@@ -38,12 +54,16 @@ export async function seedUserHandler(req: Request, res: Response) {
         //   "$2b$10$.KtyZL.Euh.0C/uAstJc7u4.6Q.KfGBd89pflwzOALPcW2IMKqSri",
         verify: true,
         role: "user",
-        avatar: "https://source.unsplash.com/random/200×200/?avatar",
+        avatar:
+          "https://res.cloudinary.com/anhkieu303252/image/upload/v1718519688/default_avatar_eyua30.jpg",
         // avatar: faker.image.avatar(),
         geoLocation: {
           location: getRandomTransformHanoiDistricts(),
           radius: 5,
         },
+        // random createdAt and updatedAt in current year
+        createdAt: getRandomPastDateInCurrentYear(),
+        updatedAt: new Date(),
       });
       await user.save();
     }
@@ -87,6 +107,9 @@ export async function seedPostHandler(req: Request, res: Response) {
           lon: user.geoLocation.location.lon,
           displayName: user.geoLocation.location.displayName,
         },
+        // random createdAt and updatedAt in current year
+        createdAt: getRandomPastDateInCurrentYear(),
+        updatedAt: new Date(),
       });
       await post.save();
     }

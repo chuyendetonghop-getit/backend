@@ -1,6 +1,8 @@
 import { HttpStatusCode } from "axios";
 import { Request, Response } from "express";
 
+import { cloneDeep } from "lodash";
+import PostModel from "../models/post.model";
 import {
   CreatePostInput,
   DeletePostInput,
@@ -12,7 +14,6 @@ import {
 } from "../schema/post.schema";
 import {
   aggregatePost,
-  createPost,
   deletePost,
   findMyPost,
   findPost,
@@ -20,24 +21,23 @@ import {
   getPostsByAdmin,
   updatePost,
 } from "../service/post.service";
+import { calculateDistance } from "../utils/location";
 import logger from "../utils/logger";
 import {
   sendErrorResponse,
   sendSuccessResponse,
 } from "../utils/responseTransform";
-import { cloneDeep } from "lodash";
-import { calculateDistance } from "../utils/location";
 
 export async function createPostHandler(
   req: Request<{}, {}, CreatePostInput["body"]>,
   res: Response
 ) {
   try {
-    const post = await createPost(req.body);
-
+    const input = req.body;
+    const Post = await PostModel.create(input);
     return sendSuccessResponse(
       res,
-      post,
+      Post,
       HttpStatusCode.Created,
       "Create post success"
     );
@@ -51,15 +51,11 @@ export async function getListPostHandler(
   req: Request<{}, {}, {}, GetListPostsInput["query"]>,
   res: Response
 ) {
-  // console.log("this is head ***", req.query);
   try {
-    // TODO: temporary solution fix type issue with req.query
     const paginatedPosts = await getListPosts(
       req.query as GetListPostsInput["query"]
     );
-
     const clonePaginatedPosts = cloneDeep(paginatedPosts);
-
     const insertedDistancePostsDocs = clonePaginatedPosts?.docs.map(
       (post: any) => {
         const distance = calculateDistance(
@@ -68,15 +64,11 @@ export async function getListPostHandler(
           post.location.coordinates[1],
           post.location.coordinates[0]
         );
-        // console.log("distance XXX->", distance);
         post.distance = distance;
-
         return post;
       }
     );
-
     clonePaginatedPosts.docs = insertedDistancePostsDocs;
-
     return sendSuccessResponse(
       res,
       clonePaginatedPosts,

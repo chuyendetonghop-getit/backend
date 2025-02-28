@@ -6,7 +6,6 @@ import {
   deletePostHandler,
   getListPostHandler,
   getMyPostsHandler,
-  getPostByAdminHandler,
   getPostByIdHandler,
   updatePostHandler,
 } from "../controller/post.controller";
@@ -14,7 +13,6 @@ import validateResource from "../middleware/validateResource";
 import {
   createPostSchema,
   deletePostSchema,
-  getListPostsAdminSchema,
   getListPostsSchema,
   getMyPostsSchema,
   getPostSchema,
@@ -28,13 +26,6 @@ router.post("/", validateResource(createPostSchema), createPostHandler);
 router.get("/", validateResource(getListPostsSchema), getListPostHandler);
 
 router.get("/me", validateResource(getMyPostsSchema), getMyPostsHandler);
-
-// admin routes
-router.get(
-  "/admin",
-  validateResource(getListPostsAdminSchema),
-  getPostByAdminHandler
-);
 
 router.get("/:id", validateResource(getPostSchema), getPostByIdHandler);
 

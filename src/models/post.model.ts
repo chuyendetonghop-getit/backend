@@ -86,7 +86,7 @@ const PostSchema = new mongoose.Schema(
 PostSchema.index({ location: "2dsphere" });
 
 PostSchema.plugin(mongoosePaginate);
-
+// Post Model
 const PostModel = mongoose.model<
   PostDocument,
   mongoose.PaginateModel<PostDocument>

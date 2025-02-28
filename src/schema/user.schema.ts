@@ -14,26 +14,6 @@ export const createUserSchema = object({
   }),
 });
 
-export const getListUsersSchema = object({
-  query: object({
-    limit: string({
-      required_error: "Limit is required",
-    }).optional(),
-    page: string({
-      required_error: "Page is required",
-    }).optional(),
-    name: string({
-      required_error: "Name is required",
-    }).optional(),
-    phone: string({
-      required_error: "Phone is required",
-    }).optional(),
-    search: string({
-      required_error: "Search is required",
-    }).optional(),
-  }),
-});
-
 export const getUserByIdSchema = object({
   params: object({
     id: string({
@@ -89,7 +69,6 @@ export const deleteUserByIdSchema = object({
 });
 
 export type CreateUserInput = TypeOf<typeof createUserSchema>;
-export type GetListUserInput = TypeOf<typeof getListUsersSchema>;
 export type GetUserByIdInput = TypeOf<typeof getUserByIdSchema>;
 export type UpdateUserByIdInput = TypeOf<typeof updateUserByIdSchema>;
 export type DeleteUserByIdInput = TypeOf<typeof deleteUserByIdSchema>;
